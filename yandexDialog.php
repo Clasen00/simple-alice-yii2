@@ -23,22 +23,16 @@ namespace frontend\modules\yandexDialog\controllers {
             ];
         }
 
-        public function actionIndex($regionId) {
+        public function actionIndex() {
 
             //получает данные из потока POST запроса
             $apiRequestArray = json_decode(trim(file_get_contents('php://input')), true);
             
-            $model = DayNews::findTodayNewsByRegion($regionId);
-			
-            for ($i = 1; $i <= 6; $i++) {
-                $newsNameArray[] = $model[$i]->news->name;
-            }
-            
-            $newsHeaders = implode("\n", $newsNameArray);
+	    $text = 'Привет, я Алиса!';
 
             $arrayToEncode = [
                 "response" => [
-                    "text" => htmlspecialchars_decode($newsHeaders),
+                    "text" => htmlspecialchars_decode($text),
                     "end_session" => false,
                 ],
                 "session" => [
@@ -51,11 +45,9 @@ namespace frontend\modules\yandexDialog\controllers {
 
             $this->content = json_encode($arrayToEncode);
 
-            $response = \Yii::$app->getResponse();
+            $response = parent::asJson($this->content);
             $response->getHeaders()->set('Content-Type', 'application/json');
             $response->getHeaders()->set('Access-Control-Allow-Origin', '*');
-            $response->format = \yii\web\Response::FORMAT_RAW;
-            $response->data = $this->content;
             $response->send();
         }
 
